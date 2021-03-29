@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="keywords" content="">
+    <link href="./css/bootstrap.min.css" rel="stylesheet">
+    <link href=".//index.css" rel="stylesheet">  
+  </head>
+  <body>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 margintb-6">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">Beforetext:</span>
+                    <textarea type="text" class="form-control" id="plaintext_before" placeholder="Before string."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 margintb-6">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">Ciphertext:</span>
+                    <textarea type="text" class="form-control" id="incodes" placeholder="Input ciphertext string."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 margintb-6">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">After_Text:</span>
+                    <textarea type="text" class="form-control" id="plaintext_after" placeholder="After string."></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-2 col-sm-offset-5 margintb-6">
+                <button class="btn btn-primary width-100-percent" id="ok" onclick="handleIncode();">Encode</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12 col-sm-12 margintb-6">
+                <div class="input-group">
+                    <span class="input-group-addon" id="basic-addon1">Pause ciphertext：</span>
+                    <textarea type="text" class="form-control" id="will_decode" placeholder="Paste the ciphertext"></textarea>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-6 col-sm-2 col-sm-offset-5 margintb-6">
+                <button class="btn btn-primary width-100-percent" id="decode" onclick="handleDecode();">Decode</button>
+            </div>
+        </div>
+        <div class="row" id="panel-result-bmr">
+                <div class="col-xs-12 margintb-6">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">ciphertext</div>
+                        <div class="panel-body">
+                            <p id="string" onclick="copyCodes();">aa‌‍‍‍‍​‌‌‍‍‍​‌‌‌‍‍​‌‌‌‌‍​‌‌‌‌‌​‍‌‌‌‌bb</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="panel-result-bmr">
+                    <div class="col-xs-12 margintb-6">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">plaintext</div>
+                            <div class="panel-body">
+                                <p id="outcodes" style="word-wrap:break-word;">aa&amp;#8204;&amp;#8205;&amp;#8205;&amp;#8205;&amp;#8205;&amp;#8203;&amp;#8204;&amp;#8204;&amp;#8205;&amp;#8205;&amp;#8205;&amp;#8203;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8205;&amp;#8205;&amp;#8203;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8205;&amp;#8203;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8203;&amp;#8205;&amp;#8204;&amp;#8204;&amp;#8204;&amp;#8204;bb</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+    <script>
+        const morseWords = ['.-','-...','-.-.','-..','.','..-.','--.','....','..','.---','-.-','.-..','--','-.','---','.--.','--.-','.-.','...','-','..-','...-','.--','-..-','-.--','--..']
+        const morseNumber = ['-----','.----','..---','...--','....-','.....','-....','--...','---..','----.']
+        let wordsToMorse = {};
+        let morseToWords = {};
+        let morseToNum = {};
+
+        //a-z array
+        let words = [];
+        for (let i = 10; i < 36; i++) {
+            let j = i.toString(36);
+            words.push(j);
+        }
+
+        //num dicts
+        let numToMorse = morseNumber;
+        for (let i in words) {
+            wordsToMorse[words[i]] = morseWords[i];
+        }
+        for (let i in wordsToMorse) {
+            morseToWords[wordsToMorse[i]] = i;
+        }
+        for (let i in morseNumber){
+            morseToNum[morseNumber[i]]=i;
+        }
+        let decodeWords = Object.assign(morseToWords, morseToNum);
+        /*  */
+        decodeWords['-...-'] = ' ';
+        decodeWords[".--.-"] = "\\";
+        wordsToMorse["\\"] = ".--.-";
+
+        // encode
+        function incode(str,textBefore,textAfter) {
+            let res = [];
+            let l = "&#8205;";
+            let s = "&#8204;";
+            let q = "&#8203;";
+            for (let i in str) {
+                let val = str[i];
+                if(val === ' '){
+                    res.push('-...-')
+                } else if (!!parseInt(val) || parseInt(val) == 0) {
+                res.push(numToMorse[str[i]]);
+                } else {
+                res.push(wordsToMorse[str[i]]);
+                }
+            } 
+            let encrypt = res.join("/");
+            encrypt = encrypt.replace(/\//g, q)
+            encrypt = encrypt.replace(/\./g, s)
+            encrypt = encrypt.replace(/\-/g, l)
+            return textBefore + encrypt + textAfter;
+        }
+
+        // decode
+        function decode(text) {
+            let decode = [];
+
+            text.match(/(\&\#8203\;|\&\#8204\;|\&\#8205\;|\u200B|\u200C|\u200D|\&zwnj\;|\&zwj\;)+/g).map(temp => {
+                temp = temp.replace(/\&\#8203\;|\u200B/g, "/");
+                temp = temp.replace(/\&\#8204\;|\u200C|\&zwnj\;/g, ".");
+                temp = temp.replace(/\&\#8205\;|\u200D|\&zwj\;/g, "-");
+                let arr = temp.split("/");
+
+                for (let i in arr) {
+                    decode.push(decodeWords[arr[i]]);
+                }
+            })
+            
+            return decode;
+        }
+
+ 
+        function handleIncode() {
+            let code_value = document.getElementById("incodes").value;
+            let ch_Z = code_value.match(/[\u4e00-\u9fa5]+/g)
+            // console.log(154,ch_Z);
+            let incodes = code_value;
+            if (ch_Z) {
+                incodes = incodes.replace(/[\u4e00-\u9fa5]/g, function (t) {
+                    return '\\u' + parseInt(t.charCodeAt(0), 10).toString(16)
+                })
+                console.log(160,incodes);
+            }
+
+            let code = incode(incodes, document.getElementById("plaintext_before").value, document.getElementById("plaintext_after").value);
+            // console.log(165,code);
+            let html = '';
+            document.getElementById("outcodes").innerHTML = html;
+            for (let i in code) {
+                setTimeout(() => {
+                    // html += code[i]
+                    document.getElementById("outcodes").innerHTML += code[i]
+                }, 5 * i);
+            }
+            document.getElementById("string").innerHTML = code;
+        }
+
+        function handleDecode() {
+            let code = decode(document.getElementById("will_decode").value);
+            let outcodes = code.join('');
+            // console.log(code, outcodes);
+
+            outcodes = outcodes.replace(/\\u[0-9a-z]{4}/g, (t) => {
+
+                return String.fromCharCode(parseInt(t.replace('\\u', ''), 16))
+            })
+            // console.log(outcodes);
+
+            document.getElementById("outcodes").innerHTML = outcodes;
+        }
+
+        function copyCodes(){
+            copyToClipboard('string');
+        }
+
+        function copyToClipboard(elementId) {
+  
+            var aux = document.createElement("input");
+            var content = document.getElementById(elementId).innerHTML || document.getElementById(elementId).value;
+            aux.setAttribute("value", content);
+            document.body.appendChild(aux);
+            aux.select();
+            document.execCommand("copy");
+            document.body.removeChild(aux);
+            alert("copy right.");
+        }
+
+    </script>
+
+    <script>
+      $(function () {
+        HtmlBind_Search();
+        Bind_Tongji();
+      });
+    </script>
+	
+
+</body></html>
